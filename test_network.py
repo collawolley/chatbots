@@ -44,36 +44,36 @@ def wordHypothesis(inputExample,net,pca,reducedVocabulary,a,X_train_PCA):
   for s in seg_list:
     try:                                        #vocabulary.index(seg_list[j]) 如果不存在，会出现异常报错，所以用python的异常机制,所以不能用if
       p=reducedVocabulary.index(s)              #这里要吐槽一下，难道无匹配就不能返回个none，非要抛出异常？？？说不定有这样的函数我没找到
-      X[p] = 1
+      X[0][p] = 1
     except:
       pass
-  Z = pca.transform(X)
+  Z = pca.transform(X)                          #通过PCA转化X为Z
   #print Z[0][:10]
   #print X_train_PCA[0][:10]
-  h = net.activate(X_train_PCA[0])
+  h = net.activate(Z)
   print sum(h)
   dicts={}
-  for i in range(0,len(h)):
+  for i in range(0,len(h)):      #把神经网络反馈结果返回到一个键为序号，值为结果的字典里
     dicts[i] = h[i]
 
   print "sort hypothposi......."
 
-  sortedDicts = sorted(dicts.iteritems(),reverse=True,key=lambda d:d[1])
+  sortedDicts = sorted(dicts.iteritems(),reverse=True,key=lambda d:d[1])   #按字典的值从大到小排序，返回的不是数组，是一个一个的元祖
 
   #print sortedDicts[:50]
 
   hWord={}
   for i in range(0,len(sortedDicts)):
-    if(sortedDicts[i][1]>=a):
-      pos=sortedDicts[i][0]
-      word=reducedVocabulary[pos][0]
-      hWord[word]= reducedVocabulary[pos][1]
+    if(sortedDicts[i][1]>=a):           #如果该值到达一个阈值
+      pos=sortedDicts[i][0]             #返回该值的序号
+      word=reducedVocabulary[pos][0]    #所在序号代表的词汇
+      hWord[word]= reducedVocabulary[pos][1] #把这个词汇，以词语做键，词语出现的一般位置做值
 
-  sortedhWord = sorted(hWord.iteritems(),reverse=False,key=lambda d:int(d[1]))
+  sortedhWord = sorted(hWord.iteritems(),reverse=False,key=lambda d:int(d[1]))  #排序返回的是元祖
   #print sortedhWord
   s=""
   for i in range(0,len(sortedhWord)):
-    s+=sortedhWord[i][0]
+    s+=sortedhWord[i][0]                #返回字符串
   return s
 if __name__ == "__main__":
   d=loadAllData()
